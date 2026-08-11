@@ -1,0 +1,9 @@
+{
+  "question": "Will the sample event resolve Yes?",
+  "outcomes": ["Yes", "No"],
+  "prices": [0.42, 0.58],
+  "liquidity_usd": 125000,
+  "volume_24h_usd": 18000,
+  "spread": 0.006
+}
+

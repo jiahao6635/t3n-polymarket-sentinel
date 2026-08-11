@@ -1,0 +1,24 @@
+/// A read-only prediction-market screening contract.
+///
+/// The caller fetches public market data and passes only the fields required
+/// for deterministic quality checks. The contract has no network, storage,
+/// wallet, signing, or trading capability.
+package z:polymarket-sentinel@0.1.0;
+
+world polymarket-sentinel {
+    export contracts;
+}
+
+interface contracts {
+    /// Standard envelope used by Terminal 3 tenant contracts.
+    record generic-input {
+        input:        option<list<u8>>,
+        user-profile: option<list<u8>>,
+        context:      option<list<u8>>,
+    }
+
+    /// Analyze normalized public market data and return data-quality signals.
+    /// This function never places an order or signs a transaction.
+    analyze-market: func(req: generic-input) -> result<list<u8>, string>;
+}
+
