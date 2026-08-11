@@ -12,17 +12,9 @@ import {
   setEnvironment,
 } from "@terminal3/t3n-sdk";
 import type { Environment, TrustAnchorOrUnsafe } from "@terminal3/t3n-sdk";
+import { fetchMarket, normalizeMarket } from "./market.js";
 
 type Action = "connect" | "register" | "invoke" | "all";
-
-type GammaMarket = {
-  question: string;
-  outcomes: string;
-  outcomePrices: string;
-  liquidity?: string | number;
-  volume24hr?: string | number;
-  spread?: string | number;
-};
 
 const action = (process.argv[2] ?? "connect") as Action;
 const slug = process.argv[3] ?? "will-gavin-newsom-win-the-2028-democratic-presidential-nomination-568";
@@ -110,53 +102,6 @@ if (action === "invoke" || action === "all") {
 
   console.log("Contract result:");
   console.log(JSON.stringify(result, null, 2));
-}
-
-async function fetchMarket(marketSlug: string): Promise<GammaMarket> {
-  const url = new URL("https://gamma-api.polymarket.com/markets");
-  url.searchParams.set("slug", marketSlug);
-  const response = await fetch(url, {
-    headers: { accept: "application/json" },
-  });
-  if (!response.ok) {
-    throw new Error(`Polymarket Gamma request failed: HTTP ${response.status}`);
-  }
-  const markets = (await response.json()) as GammaMarket[];
-  if (!markets[0]) {
-    throw new Error(`No Polymarket market found for slug: ${marketSlug}`);
-  }
-  return markets[0];
-}
-
-function normalizeMarket(market: GammaMarket) {
-  const outcomes = parseStringArray(market.outcomes, "outcomes");
-  const priceStrings = parseStringArray(market.outcomePrices, "outcomePrices");
-  const prices = priceStrings.map((value) => parseFiniteNumber(value, "price"));
-
-  return {
-    question: market.question,
-    outcomes,
-    prices,
-    liquidity_usd: parseFiniteNumber(market.liquidity ?? 0, "liquidity"),
-    volume_24h_usd: parseFiniteNumber(market.volume24hr ?? 0, "volume24hr"),
-    spread: parseFiniteNumber(market.spread ?? 0, "spread"),
-  };
-}
-
-function parseStringArray(raw: string, field: string): string[] {
-  const value: unknown = JSON.parse(raw);
-  if (!Array.isArray(value) || !value.every((item) => typeof item === "string")) {
-    throw new Error(`${field} is not a JSON string array`);
-  }
-  return value;
-}
-
-function parseFiniteNumber(raw: string | number, field: string): number {
-  const value = Number(raw);
-  if (!Number.isFinite(value)) {
-    throw new Error(`${field} is not a finite number`);
-  }
-  return value;
 }
 
 function parseEnvironment(raw: string): Environment {

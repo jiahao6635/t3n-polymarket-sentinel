@@ -7,6 +7,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["quickstart.ts"]
+  "include": ["*.ts"]
 }
-

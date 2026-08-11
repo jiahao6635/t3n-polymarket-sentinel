@@ -29,6 +29,47 @@ The TypeScript adapter fetches public data from Polymarket's Gamma API, normaliz
 - a deterministic quality score from 0 to 100;
 - explicit warnings for thin liquidity, low activity, wide spreads, or inconsistent prices.
 
+## Generate a client-ready public market report
+
+The app also includes a standalone, read-only reporting command for paid research deliverables. It accepts one or more public Polymarket market slugs and writes a Chinese-friendly Markdown report plus machine-readable JSON and CSV. It uses the same Gamma normalization and deterministic scoring thresholds as the Rust contract, but does not require a Terminal 3 API key or contract deployment.
+
+```bash
+cd app
+npm install
+npm run report -- \
+  will-gavin-newsom-win-the-2028-democratic-presidential-nomination-568 \
+  will-donald-trump-win-the-2028-us-presidential-election \
+  --out-dir ../reports \
+  --name client-market-check
+```
+
+The command creates:
+
+```text
+reports/client-market-check.md
+reports/client-market-check.json
+reports/client-market-check.csv
+```
+
+Each market includes:
+
+- UTC collection time and Gamma source-update time;
+- raw and normalized outcome prices;
+- price-sum consistency and deviation in basis points;
+- liquidity, spread, 24-hour volume, and activity ratio;
+- the 0-100 deterministic quality score and Chinese quality label;
+- data-quality and market-status warnings;
+- an explicit non-financial-advice disclaimer.
+
+Reporting safety boundary:
+
+- public Gamma API reads only;
+- no wallet, private key, API key, signing, or order endpoint;
+- no deposit, transfer, trade, or position management;
+- no price prediction, financial advice, or return promise.
+
+Show CLI options with `npm run report -- --help`. When `--name` is omitted, the command creates a timestamped basename under `app/reports/` (or the directory supplied through `--out-dir`).
+
 ## Architecture
 
 ```mermaid
@@ -60,6 +101,14 @@ Optional interface verification:
 
 ```bash
 wasm-tools component wit target/wasm32-wasip2/release/z_polymarket_sentinel.wasm
+```
+
+Test and type-check the public-data adapter and report generator:
+
+```bash
+cd app
+npm test
+npm run typecheck
 ```
 
 ## Connect, register, and invoke on Terminal 3 sandbox
@@ -103,6 +152,9 @@ The verified sandbox deployment is contract ID `590`, script `z:6c90567a5d037e13
 src/                 Rust contract and unit tests
 wit/world.wit        exported Terminal 3 contract interface
 app/quickstart.ts    connect, register, fetch public market data, invoke
+app/market.ts        shared Gamma normalization and deterministic scoring
+app/report.ts        multi-market Markdown/JSON/CSV report command
+app/market.test.ts   offline adapter and report tests
 fixtures/            safe sample input
 docs/                bounty submission report and evidence
 ```

@@ -8,6 +8,8 @@
     "register": "tsx quickstart.ts register",
     "invoke": "tsx quickstart.ts invoke",
     "all": "tsx quickstart.ts all",
+    "report": "tsx report.ts",
+    "test": "tsx --test *.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -19,4 +21,3 @@
     "typescript": "^5.9.0"
   }
 }
-
