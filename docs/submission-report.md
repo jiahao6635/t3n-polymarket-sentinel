@@ -46,7 +46,7 @@ Verified against Terminal 3 sandbox on 11 August 2026. The SDK authenticated as 
 
 ### 3. Rust tests and WASM build
 
-Public evidence: [GitHub Actions run 31469356002](https://github.com/jiahao6635/t3n-polymarket-sentinel/actions/runs/31469356002) passed formatting, six Rust unit tests, Clippy with warnings denied, the WASM release build, and TypeScript type-checking. Add a screenshot of the run summary and generated `.wasm` artifact.
+Public evidence: [GitHub Actions run 31470761322](https://github.com/jiahao6635/t3n-polymarket-sentinel/actions/runs/31470761322) passed formatting, six Rust unit tests, Clippy with warnings denied, the WASM release build, and TypeScript type-checking. Add a screenshot of the run summary and generated `.wasm` artifact.
 
 ### 4. Contract registration
 
