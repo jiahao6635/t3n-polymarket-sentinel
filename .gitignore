@@ -5,4 +5,5 @@
 !.env.example
 .terminal3-deployment.json
 .DS_Store
-
+__pycache__/
+docs/.docx-qa/

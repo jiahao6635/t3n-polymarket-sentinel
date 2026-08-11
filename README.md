@@ -82,7 +82,7 @@ The claim page currently provisions the sandbox flow, so the adapter defaults to
 
 SDK 4.35.0 requires a signed trust anchor. The adapter attempts `fetchTrustedManifest()` by default and fails closed if it cannot verify one. For a non-production onboarding run only, `T3N_UNSAFE_TRUST_SERVER=1` enables the SDK's explicit unsafe opt-out; this is never allowed when `T3N_ENV=production`.
 
-The verified sandbox deployment is contract ID `590`, script `z:6c90567a5d037e13ae0817b22e6a6fec6630a901:pm-sentinel`, version `0.1.0`. A successful public-data invocation is recorded in [the submission report](docs/submission-report.md).
+The verified sandbox deployment is contract ID `590`, script `z:6c90567a5d037e13ae0817b22e6a6fec6630a901:pm-sentinel`, version `0.1.0`. A successful public-data invocation is recorded in [the submission report](docs/submission-report.md), with a visually verified [Google Docs-targeted DOCX](docs/Terminal3_ADK_Submission_Jiahao.docx) ready for import.
 
 ## Example input
 
