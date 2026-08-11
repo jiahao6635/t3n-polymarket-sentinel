@@ -25,6 +25,7 @@ The contract intentionally imports no host capabilities, so it cannot access wal
 - [x] Build a custom Rust TEE contract
 - [x] Add native unit tests
 - [x] Build the WASM component locally
+- [x] Pass public Rust and TypeScript CI
 - [ ] Authenticate the Terminal 3 `T3nClient`
 - [ ] Confirm `TenantClient` with `tenant.me()`
 - [ ] Register `pm-sentinel` version `0.1.0`
@@ -43,7 +44,7 @@ Add a screenshot showing `Connected as: did:t3n:...` and `TenantClient ready.`
 
 ### 3. Rust tests and WASM build
 
-Add a screenshot of passing tests, clippy, and the generated `.wasm` artifact.
+Public evidence: [GitHub Actions run 31469356002](https://github.com/jiahao6635/t3n-polymarket-sentinel/actions/runs/31469356002) passed formatting, six Rust unit tests, Clippy with warnings denied, the WASM release build, and TypeScript type-checking. Add a screenshot of the run summary and generated `.wasm` artifact.
 
 ### 4. Contract registration
 
