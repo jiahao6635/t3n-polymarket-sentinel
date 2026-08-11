@@ -5,10 +5,12 @@
 - Participant: Jiahao / GitHub `jiahao6635`
 - Bounty: Create Agent ID, claim free tokens, and deploy first Rust contract
 - Repository: https://github.com/jiahao6635/t3n-polymarket-sentinel
-- DID: add after claim-page onboarding
-- Contract: `z:<tenant-id>:pm-sentinel`
+- DID: `did:t3n:6c90567a5d037e13ae0817b22e6a6fec6630a901`
+- Contract: `z:6c90567a5d037e13ae0817b22e6a6fec6630a901:pm-sentinel`
+- Contract ID: `590`
 - Version: `0.1.0`
-- Network: Terminal 3 testnet
+- Network: Terminal 3 sandbox (claim-page environment)
+- Registered: `2026-08-11T07:40:42.192Z`
 
 ## What I built
 
@@ -18,29 +20,29 @@ The contract intentionally imports no host capabilities, so it cannot access wal
 
 ## Completion checklist
 
-- [ ] Sign in through the Terminal 3 claim page
-- [ ] Save the one-time API key outside the repository
-- [ ] Record the automatically generated DID
+- [x] Sign in through the Terminal 3 claim page
+- [x] Save the one-time API key outside the repository
+- [x] Record the automatically generated DID
 - [x] Install Rust and `wasm32-wasip2`
 - [x] Build a custom Rust TEE contract
 - [x] Add native unit tests
 - [x] Build the WASM component locally
 - [x] Pass public Rust and TypeScript CI
-- [ ] Authenticate the Terminal 3 `T3nClient`
-- [ ] Confirm `TenantClient` with `tenant.me()`
-- [ ] Register `pm-sentinel` version `0.1.0`
-- [ ] Invoke `analyze-market` with public Polymarket data
+- [x] Authenticate the Terminal 3 `T3nClient`
+- [x] Confirm `TenantClient` with `tenant.tenant.me()`
+- [x] Register `pm-sentinel` version `0.1.0`
+- [x] Invoke `analyze-market` with public Polymarket data
 - [ ] Add screenshots below
 
 ## Test evidence
 
 ### 1. Claim page and generated identity
 
-Add a redacted screenshot showing successful claim, credits, and DID. Do not show the API key.
+The claim-page flow completed and generated DID `did:t3n:6c90567a5d037e13ae0817b22e6a6fec6630a901`. Add a redacted screenshot showing the successful claim and DID only after the one-time API key is no longer visible.
 
 ### 2. Quickstart authentication
 
-Add a screenshot showing `Connected as: did:t3n:...` and `TenantClient ready.`
+Verified against Terminal 3 sandbox on 11 August 2026. The SDK authenticated as `did:t3n:6c90567a5d037e13ae0817b22e6a6fec6630a901`, and `tenant.tenant.me()` completed before the adapter printed `TenantClient ready.`
 
 ### 3. Rust tests and WASM build
 
@@ -48,11 +50,36 @@ Public evidence: [GitHub Actions run 31469356002](https://github.com/jiahao6635/
 
 ### 4. Contract registration
 
-Add a screenshot showing the script name and numeric contract ID. Do not show credentials.
+Registered script `z:6c90567a5d037e13ae0817b22e6a6fec6630a901:pm-sentinel`, version `0.1.0`, as contract ID `590` at `2026-08-11T07:40:42.192Z`. Add a screenshot of these non-secret fields only.
 
 ### 5. Contract invocation
 
-Add a screenshot of the decoded quality-analysis result for a public market slug.
+Invocation completed successfully on 11 August 2026 using the active, order-accepting Polymarket market slug `will-bitcoin-reach-100k-in-august-2026` (`Will Bitcoin reach $100,000 in August?`). The public Gamma API reported an event end date of `2026-09-01T04:00:00Z`.
+
+Decoded contract result:
+
+```json
+{
+  "question": "Will Bitcoin reach $100,000 in August?",
+  "normalized_prices": [0.0015, 0.9985],
+  "dominant_outcome": "No",
+  "dominant_probability": 0.9985,
+  "liquidity_tier": "deep",
+  "quality_score": 100,
+  "metrics": {
+    "price_sum": 1,
+    "sum_deviation_bps": 0,
+    "spread_bps": 10,
+    "liquidity_usd": 140379.14,
+    "volume_24h_usd": 33855.55,
+    "activity_ratio_bps": 2412
+  },
+  "warnings": [],
+  "disclaimer": "Data-quality screening only; not trading advice."
+}
+```
+
+The invocation used only public market data. It placed no order, connected no wallet, and moved no funds.
 
 ## Bugs and documentation friction found
 
@@ -99,6 +126,18 @@ A clean `npm install @terminal3/t3n-sdk@4.35.0` followed by `npm audit` reports 
 ```
 
 No exploit attempt was made. Suggested fix: review whether the componentization tooling is needed in the published runtime package and upgrade or constrain the affected transitive dependency where compatible.
+
+### F. The SDK's documented signed trust-manifest path currently returns HTTP 405
+
+SDK 4.35.0 makes `trustAnchor` mandatory, and its bundled README recommends `await fetchTrustedManifest("testnet")`. On 11 August 2026, both `fetchTrustedManifest("sandbox")` and `fetchTrustedManifest("testnet")` resolved to the current Singapore testnet node and failed with:
+
+```text
+Trust manifest request to https://cn-api.sg.testnet.t3n.terminal3.io/api/trust-manifest failed: 405 Method Not Allowed
+```
+
+This leaves new developers with two bad choices: they cannot follow the public Quickstart because it omits the now-required field, and the SDK README's safe replacement fails before handshake. The only remaining SDK path is the explicit `{ unsafe_trust_server: true }` opt-out, which disables attestation verification.
+
+Suggested fix: publish/fix the signed manifest endpoint before requiring `trustAnchor`, and update the Quickstart with a fail-closed example. If the unsafe option must be used temporarily, label it as non-production and explain the security tradeoff.
 
 ## Notes for reviewers
 

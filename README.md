@@ -62,7 +62,7 @@ Optional interface verification:
 wasm-tools component wit target/wasm32-wasip2/release/z_polymarket_sentinel.wasm
 ```
 
-## Connect, register, and invoke on Terminal 3 testnet
+## Connect, register, and invoke on Terminal 3 sandbox
 
 The Terminal 3 claim page shows the API key only once. Keep it in a local ignored file or shell environment; never paste it into a repository, issue, screenshot, or submission document.
 
@@ -77,6 +77,12 @@ npm run invoke -- <polymarket-market-slug>
 ```
 
 For a fresh tenant, `npm run all -- <slug>` performs registration and one invocation in a single run. Registration versions are immutable, so do not rerun `register` with the same version.
+
+The claim page currently provisions the sandbox flow, so the adapter defaults to `T3N_ENV=sandbox`. Override it with `T3N_ENV=testnet` only when the DID and credits were provisioned there.
+
+SDK 4.35.0 requires a signed trust anchor. The adapter attempts `fetchTrustedManifest()` by default and fails closed if it cannot verify one. For a non-production onboarding run only, `T3N_UNSAFE_TRUST_SERVER=1` enables the SDK's explicit unsafe opt-out; this is never allowed when `T3N_ENV=production`.
+
+The verified sandbox deployment is contract ID `590`, script `z:6c90567a5d037e13ae0817b22e6a6fec6630a901:pm-sentinel`, version `0.1.0`. A successful public-data invocation is recorded in [the submission report](docs/submission-report.md).
 
 ## Example input
 

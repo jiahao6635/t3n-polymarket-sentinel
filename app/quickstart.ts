@@ -11,6 +11,7 @@ import {
   metamask_sign,
   setEnvironment,
 } from "@terminal3/t3n-sdk";
+import type { Environment, TrustAnchorOrUnsafe } from "@terminal3/t3n-sdk";
 
 type Action = "connect" | "register" | "invoke" | "all";
 
@@ -36,11 +37,12 @@ if (!apiKey) {
   throw new Error("T3N_API_KEY is missing. Load it from a local ignored file or shell environment.");
 }
 
-setEnvironment("testnet");
+const environment = parseEnvironment(process.env.T3N_ENV ?? "sandbox");
+setEnvironment(environment);
 
 const wasmComponent = await loadWasmComponent();
 const address = eth_get_address(apiKey);
-const trustAnchor = await fetchTrustedManifest("testnet");
+const trustAnchor = await resolveTrustAnchor(environment);
 const t3n = new T3nClient({
   baseUrl: getNodeUrl(),
   trustAnchor,
@@ -53,6 +55,7 @@ const t3n = new T3nClient({
 await t3n.handshake();
 const auth = await t3n.authenticate(createEthAuthInput(address));
 const tenantDid = auth.value;
+console.log("Environment:", environment);
 console.log("Connected as:", tenantDid);
 
 const tenant = new TenantClient({
@@ -154,4 +157,22 @@ function parseFiniteNumber(raw: string | number, field: string): number {
     throw new Error(`${field} is not a finite number`);
   }
   return value;
+}
+
+function parseEnvironment(raw: string): Environment {
+  if (raw === "sandbox" || raw === "testnet" || raw === "production") {
+    return raw;
+  }
+  throw new Error(`Unsupported T3N_ENV: ${raw}`);
+}
+
+async function resolveTrustAnchor(environment: Environment): Promise<TrustAnchorOrUnsafe> {
+  if (process.env.T3N_UNSAFE_TRUST_SERVER === "1") {
+    if (environment === "production") {
+      throw new Error("Unsafe server trust is forbidden in production.");
+    }
+    console.warn("WARNING: TEE trust-anchor verification is disabled for this non-production run.");
+    return { unsafe_trust_server: true };
+  }
+  return fetchTrustedManifest(environment);
 }
